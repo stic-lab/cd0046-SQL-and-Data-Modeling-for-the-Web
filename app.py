@@ -115,8 +115,6 @@ class Artist(db.Model):
     seeking_venue = db.Column(db.Boolean)
     seeking_description = db.Column(db.String(120))
     image_link = db.Column(db.String(500))
-    genre_associations = db.relationship('Genre', secondary=genre_associations,
-      backref=db.backref('artist', lazy=True))
 
     def __repr__(self) -> str:
        return super().__repr__()
