@@ -30,7 +30,7 @@ migrate = Migrate(app, db)
 # Models.
 #----------------------------------------------------------------------------#
 
-# Create Show Models, this model containt the many to many relationship betweent Venues and Artists
+# Create Show Models, this model containt the many to many relationship between Venues and Artists
 shows = db.Table('shows',
                 db.Column('artist_id', db.Integer, db.ForeignKey(
                     'artist.id'), primary_key=True),
@@ -38,12 +38,28 @@ shows = db.Table('shows',
                     'venue.id'), primary_key=True),
                 db.Column('start_time',  db.DateTime)
                        )
+
+# Create genre_associations Models, this model containt the many to many relationship between Venues/Artist and genres
+genre_artist = db.Table('genre_artist',
+                 db.Column('genre_id', db.Integer, db.ForeignKey(
+                     'genres.name'), primary_key=True),
+                  db.Column('artist_id', db.Integer, db.ForeignKey(
+                     'artist.id'), primary_key=True),
+                 )
+genre_venue = db.Table('genre_venue',
+                 db.Column('genre_id', db.Integer, db.ForeignKey(
+                     'genres.name'), primary_key=True),
+                 db.Column('venue_id', db.Integer, db.ForeignKey(
+                     'venue.id'), primary_key=True)
+                 )
 # Create Area Models
 class Genre(db.Model):
     __tablename__ = 'genres'
     name = db.Column(db.String(50), primary_key=True)
-    venues = db.relationship('Venue', backref='genres', lazy=True)
-    artists = db.relationship('Artist', backref='genres', lazy=True)
+    genre_venue = db.relationship('Genre', secondary=genre_venue,
+                                  backref=db.backref('genres', lazy=True))
+    genre_artist = db.relationship('Genre', secondary=genre_artist,
+                                  backref=db.backref('genres', lazy=True))
 
     def __repr__(self) -> str:
        return super().__repr__()
@@ -65,7 +81,7 @@ class Venue(db.Model):
     __tablename__ = 'venue'
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(50), nullable=True)
+    name = db.Column(db.String(50), nullable=False)
     genres = db.Column(db.String(50), db.ForeignKey(
         'genres.name'), nullable=False)
     address = db.Column(db.String(255), nullable=False)
@@ -99,6 +115,8 @@ class Artist(db.Model):
     seeking_venue = db.Column(db.Boolean)
     seeking_description = db.Column(db.String(120))
     image_link = db.Column(db.String(500))
+    genre_associations = db.relationship('Genre', secondary=genre_associations,
+      backref=db.backref('artist', lazy=True))
 
     def __repr__(self) -> str:
        return super().__repr__()
@@ -153,7 +171,7 @@ def venues():
       "num_upcoming_shows": 0,
     }]
   }]
-  return render_template('pages/venues.html', areas=data);
+  return render_template('pages/venues.html', areas=data)
 
 @app.route('/venues/search', methods=['POST'])
 def search_venues():
