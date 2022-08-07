@@ -8,10 +8,12 @@ import babel
 from flask import Flask, render_template, request, Response, flash, redirect, url_for
 from flask_moment import Moment
 from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 import logging
 from logging import Formatter, FileHandler
 from flask_wtf import Form
 from forms import *
+
 #----------------------------------------------------------------------------#
 # App Config.
 #----------------------------------------------------------------------------#
@@ -19,43 +21,87 @@ from forms import *
 app = Flask(__name__)
 moment = Moment(app)
 app.config.from_object('config')
-db = SQLAlchemy(app)
 
-# TODO: connect to a local postgresql database
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:postgres@localhost:5432/fyyur'
+db = SQLAlchemy(app)
+migrate = Migrate(app, db)
 
 #----------------------------------------------------------------------------#
 # Models.
 #----------------------------------------------------------------------------#
 
+# Create Show Models, this model containt the many to many relationship betweent Venues and Artists
+shows = db.Table('shows',
+                db.Column('artist_id', db.Integer, db.ForeignKey(
+                    'artist.id'), primary_key=True),
+                db.Column('venue_id', db.Integer, db.ForeignKey(
+                    'venue.id'), primary_key=True),
+                db.Column('start_time',  db.DateTime)
+                       )
+# Create Area Models
+class Genre(db.Model):
+    __tablename__ = 'genres'
+    name = db.Column(db.String(50), primary_key=True)
+    venues = db.relationship('Venue', backref='genres', lazy=True)
+    artists = db.relationship('Artist', backref='genres', lazy=True)
+
+    def __repr__(self) -> str:
+       return super().__repr__()
+
+# Create Area Models
+class Area(db.Model):
+    __tablename__ = 'area'
+    id = db.Column(db.Integer, primary_key=True)
+    state = db.Column(db.String(2), primary_key=True)
+    city = db.Column(db.String(50), nullable=True)
+    venues = db.relationship('Venue', backref='area', lazy=True)
+    artists = db.relationship('Artist', backref='area', lazy=True)
+
+    def __repr__(self) -> str:
+       return super().__repr__()
+
+# Create Venue Models
 class Venue(db.Model):
-    __tablename__ = 'Venue'
+    __tablename__ = 'venue'
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String)
-    city = db.Column(db.String(120))
-    state = db.Column(db.String(120))
-    address = db.Column(db.String(120))
-    phone = db.Column(db.String(120))
+    name = db.Column(db.String(50), nullable=True)
+    genres = db.Column(db.String(50), db.ForeignKey(
+        'genres.name'), nullable=False)
+    address = db.Column(db.String(255), nullable=False)
+    area = db.Column(db.Integer, db.ForeignKey(
+        'area.id'), nullable=False)
+    phone = db.Column(db.String(50))
+    website = db.Column(db.String(255))
+    facebook_link = db.Column(db.String(255))
+    seeking_talent = db.Column(db.Boolean)
+    seeking_description = db.Column(db.String(255))
     image_link = db.Column(db.String(500))
-    facebook_link = db.Column(db.String(120))
+    shows = db.relationship('Artist', secondary=shows,
+      backref=db.backref('venues', lazy=True))
 
-    # TODO: implement any missing fields, as a database migration using Flask-Migrate
+    def __repr__(self) -> str:
+       return super().__repr__()
 
+# Create Artist Models
 class Artist(db.Model):
-    __tablename__ = 'Artist'
+    __tablename__ = 'artist'
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String)
-    city = db.Column(db.String(120))
-    state = db.Column(db.String(120))
+    name = db.Column(db.String(50), nullable=False)
+    genres = db.Column(db.String(50), db.ForeignKey(
+        'genres.name'), nullable=False)
+    area = db.Column(db.Integer, db.ForeignKey(
+        'area.id'), nullable=False)
     phone = db.Column(db.String(120))
-    genres = db.Column(db.String(120))
-    image_link = db.Column(db.String(500))
+    website = db.Column(db.String(120))
     facebook_link = db.Column(db.String(120))
+    seeking_venue = db.Column(db.Boolean)
+    seeking_description = db.Column(db.String(120))
+    image_link = db.Column(db.String(500))
 
-    # TODO: implement any missing fields, as a database migration using Flask-Migrate
-
-# TODO Implement Show and Artist models, and complete all model relationships and properties, as a database migration.
+    def __repr__(self) -> str:
+       return super().__repr__()
 
 #----------------------------------------------------------------------------#
 # Filters.
@@ -85,8 +131,7 @@ def index():
 
 @app.route('/venues')
 def venues():
-  # TODO: replace with real venues data.
-  #       num_upcoming_shows should be aggregated based on number of upcoming shows per venue.
+  data = Todo.query.all()
   data=[{
     "city": "San Francisco",
     "state": "CA",
@@ -227,7 +272,7 @@ def create_venue_submission():
   # TODO: on unsuccessful db insert, flash an error instead.
   # e.g., flash('An error occurred. Venue ' + data.name + ' could not be listed.')
   # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
-  return render_template('pages/home.html')
+  return render_template(home)
 
 @app.route('/venues/<venue_id>', methods=['DELETE'])
 def delete_venue(venue_id):
@@ -420,7 +465,7 @@ def create_artist_submission():
   flash('Artist ' + request.form['name'] + ' was successfully listed!')
   # TODO: on unsuccessful db insert, flash an error instead.
   # e.g., flash('An error occurred. Artist ' + data.name + ' could not be listed.')
-  return render_template('pages/home.html')
+  return render_template(home)
 
 
 #  Shows
@@ -484,7 +529,7 @@ def create_show_submission():
   # TODO: on unsuccessful db insert, flash an error instead.
   # e.g., flash('An error occurred. Show could not be listed.')
   # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
-  return render_template('pages/home.html')
+  return render_template(home)
 
 @app.errorhandler(404)
 def not_found_error(error):
