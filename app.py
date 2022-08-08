@@ -2,6 +2,7 @@
 # Imports
 #----------------------------------------------------------------------------#
 
+from enum import unique
 import json
 import dateutil.parser
 import babel
@@ -34,10 +35,10 @@ migrate = Migrate(app, db)
 shows = db.Table('shows',
                 db.Column('id', db.Integer, primary_key=True),
                 db.Column('artist_id', db.Integer, db.ForeignKey(
-                    'artist.id'), nullable=True),
+                    'artist.id'), nullable=False),
                 db.Column('venue_id', db.Integer, db.ForeignKey(
-                    'venue.id'), nullable=True),
-                db.Column('start_time',  db.DateTime, primary_key=True)
+                    'venue.id'), nullable=False),
+                 db.Column('start_time',  db.DateTime, nullable=False)
                        )
 
 # Create genre_associations Models, this model containt the many to many relationship between Venues/Artist and genres
@@ -69,7 +70,7 @@ class Genre(db.Model):
 class Area(db.Model):
     __tablename__ = 'area'
     id = db.Column(db.Integer, primary_key=True)
-    state = db.Column(db.String(2), primary_key=True)
+    state = db.Column(db.String(2), unique=True)
     city = db.Column(db.String(50), nullable=True)
     venues = db.relationship('Venue', backref='area', lazy=True)
     artists = db.relationship('Artist', backref='area', lazy=True)
