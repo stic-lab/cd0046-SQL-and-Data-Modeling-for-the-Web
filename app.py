@@ -32,22 +32,23 @@ migrate = Migrate(app, db)
 
 # Create Show Models, this model containt the many to many relationship between Venues and Artists
 shows = db.Table('shows',
+                db.Column('id', db.Integer, primary_key=True),
                 db.Column('artist_id', db.Integer, db.ForeignKey(
-                    'artist.id'), primary_key=True),
+                    'artist.id'), nullable=True),
                 db.Column('venue_id', db.Integer, db.ForeignKey(
-                    'venue.id'), primary_key=True),
-                db.Column('start_time',  db.DateTime)
+                    'venue.id'), nullable=True),
+                db.Column('start_time',  db.DateTime, primary_key=True)
                        )
 
 # Create genre_associations Models, this model containt the many to many relationship between Venues/Artist and genres
 genre_artist = db.Table('genre_artist',
-                 db.Column('genre_id', db.Integer, db.ForeignKey(
+                        db.Column('genre_id', db.String(50), db.ForeignKey(
                      'genres.name'), primary_key=True),
-                  db.Column('artist_id', db.Integer, db.ForeignKey(
+                        db.Column('artist_id', db.Integer, db.ForeignKey(
                      'artist.id'), primary_key=True),
                  )
 genre_venue = db.Table('genre_venue',
-                 db.Column('genre_id', db.Integer, db.ForeignKey(
+                       db.Column('genre_id', db.String(50), db.ForeignKey(
                      'genres.name'), primary_key=True),
                  db.Column('venue_id', db.Integer, db.ForeignKey(
                      'venue.id'), primary_key=True)
@@ -82,17 +83,15 @@ class Venue(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
-    genres = db.Column(db.String(50), db.ForeignKey(
-        'genres.name'), nullable=False)
     address = db.Column(db.String(255), nullable=False)
     area = db.Column(db.Integer, db.ForeignKey(
         'area.id'), nullable=False)
-    phone = db.Column(db.String(50))
+    phone = db.Column(db.String(50), nullable=True)
     website = db.Column(db.String(255))
-    facebook_link = db.Column(db.String(255))
-    seeking_talent = db.Column(db.Boolean)
-    seeking_description = db.Column(db.String(255))
-    image_link = db.Column(db.String(500))
+    facebook_link = db.Column(db.String(255), nullable=True)
+    seeking_talent = db.Column(db.Boolean, nullable=False, default=False)
+    seeking_description = db.Column(db.String(255), nullable=True)
+    image_link = db.Column(db.String(255), nullable=True)
     shows = db.relationship('Artist', secondary=shows,
       backref=db.backref('venues', lazy=True))
 
@@ -105,16 +104,14 @@ class Artist(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
-    genres = db.Column(db.String(50), db.ForeignKey(
-        'genres.name'), nullable=False)
     area = db.Column(db.Integer, db.ForeignKey(
         'area.id'), nullable=False)
-    phone = db.Column(db.String(120))
-    website = db.Column(db.String(120))
-    facebook_link = db.Column(db.String(120))
-    seeking_venue = db.Column(db.Boolean)
-    seeking_description = db.Column(db.String(120))
-    image_link = db.Column(db.String(500))
+    phone = db.Column(db.String(120), nullable=True)
+    website = db.Column(db.String(120), nullable=True)
+    facebook_link = db.Column(db.String(120), nullable=True)
+    seeking_venue = db.Column(db.Boolean, nullable=False, default=False)
+    seeking_description = db.Column(db.String(255), nullable=True)
+    image_link = db.Column(db.String(500), nullable=True)
 
     def __repr__(self) -> str:
        return super().__repr__()
