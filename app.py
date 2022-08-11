@@ -287,8 +287,6 @@ def create_venue_form():
 
 @app.route('/venues/create', methods=['POST'])
 def create_venue_submission():
-  # TODO: insert form data as a new Venue record in the db, instead
-  # TODO: modify data to be the data object returned from db insertion
   form = VenueForm()
   # print("about to validate", file=sys.stderr)
   if form.validate_on_submit():  
@@ -444,7 +442,7 @@ def edit_artist(artist_id):
     "id": result.id,
     "name": result.name,
     "genres": result.genres,
-    "city": result.area.city,
+    "city": result.city,
     "state": result.area.state,
     "phone": result.phone,
     "website": result.website,
@@ -458,8 +456,39 @@ def edit_artist(artist_id):
 
 @app.route('/artists/<int:artist_id>/edit', methods=['POST'])
 def edit_artist_submission(artist_id):
-  # TODO: take values from the form submitted, and update existing
-  # artist record with ID <artist_id> using the new attributes
+
+  form = ArtistForm()
+  # print("about to validate", file=sys.stderr)
+  if form.validate_on_submit():
+    artist = Artist.query.get(artist_id)
+    artist.name = form.name.data
+    artist.city = form.city.data
+    artist.phone = form.phone.data
+    artist.website = form.website_link.data
+    artist.image_link = form.image_link.data
+    artist.facebook_link = form.facebook_link.data
+    artist.seeking_venue = form.seeking_venue.data
+    artist.seeking_description = form.seeking_description.data
+    artist.state = form.state.data
+    genres = []
+    for genre in form.genres.data:
+      if Genre.query.filter_by(name=genre).one():
+        genres.append(Genre.query.filter_by(name=genre).one())
+      else:
+        genres.append(genre)
+
+    artist.genres = genres
+    try:
+      db.session.commit()
+      flash('Artist ' + form.name.data + ' was successfully updated!')
+    except Exception as e:
+      db.session.rollback()
+      flash('An error occurred. Artist ' +
+            form.name.data + ' could not be updated.')
+    finally:
+      db.session.close()
+  else:
+    flash('Form must be correctly filled')
 
   return redirect(url_for('show_artist', artist_id=artist_id))
 
@@ -471,7 +500,7 @@ def edit_venue(venue_id):
     "name": result.name,
     "genres": result.genres,
     "address": result.address,
-    "city": result.area.city,
+    "city": result.city,
     "state": result.area.state,
     "phone": result.phone,
     "website": result.website,
@@ -485,8 +514,40 @@ def edit_venue(venue_id):
 
 @app.route('/venues/<int:venue_id>/edit', methods=['POST'])
 def edit_venue_submission(venue_id):
-  # TODO: take values from the form submitted, and update existing
-  # venue record with ID <venue_id> using the new attributes
+  form = VenueForm()
+  # print("about to validate", file=sys.stderr)
+  if form.validate_on_submit():
+    venue = Venue.query.get(venue_id)
+    venue.name = form.name.data,
+    venue.address = form.address.data
+    venue.city = form.city.data
+    venue.phone = form.phone.data
+    venue.website = form.website_link.data
+    venue.image_link = form.image_link.data
+    venue.facebook_link = form.facebook_link.data
+    venue.seeking_talent=form.seeking_talent.data
+    venue.seeking_description = form.seeking_description.data
+    venue.state = form.state.data
+    genres = []
+    for genre in form.genres.data:
+      if Genre.query.filter_by(name=genre).one():
+        genres.append(Genre.query.filter_by(name=genre).one())
+      else:
+        genres.append(genre)
+
+    venue.genres = genres
+    try:
+      db.session.commit()
+      flash('Venue ' + form.name.data + ' was successfully updated!')
+    except Exception as e:
+      db.session.rollback()
+      flash('An error occurred. Venue ' +
+            form.name.data + ' could not be updated.')
+    finally:
+      db.session.close()
+  else:
+    flash('Form must be correctly filled')
+
   return redirect(url_for('show_venue', venue_id=venue_id))
 
 #  Create Artist
@@ -580,7 +641,6 @@ def create_show_submission():
     except Exception as e:
       db.session.rollback()
       flash('An error occurred. Show could not be listed.')
-      flash(e)
     finally:
       db.session.close()
   else:
