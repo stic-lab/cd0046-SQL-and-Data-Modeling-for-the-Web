@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 5e5eeaaabf18
+Revision ID: 69eaafad22a9
 Revises: 
-Create Date: 2022-08-09 15:43:18.843987
+Create Date: 2022-08-11 05:26:30.315269
 
 """
 from alembic import op
@@ -17,7 +17,7 @@ from sqlalchemy import String, Integer, Date, Boolean, DateTime
 
 
 # revision identifiers, used by Alembic.
-revision = '5e5eeaaabf18'
+revision = '69eaafad22a9'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -128,11 +128,11 @@ def upgrade():
     )
     op.create_table('shows',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('artist_id', sa.Integer(), nullable=False),
-    sa.Column('venue_id', sa.Integer(), nullable=False),
+    sa.Column('artist_id', sa.Integer(), nullable=True),
+    sa.Column('venue_id', sa.Integer(), nullable=True),
     sa.Column('start_time', sa.DateTime(), nullable=False),
-    sa.ForeignKeyConstraint(['artist_id'], ['artist.id'], ),
-    sa.ForeignKeyConstraint(['venue_id'], ['venue.id'], ),
+    sa.ForeignKeyConstraint(['artist_id'], ['artist.id'], ondelete='SET NULL'),
+    sa.ForeignKeyConstraint(['venue_id'], ['venue.id'], ondelete='SET NULL'),
     sa.PrimaryKeyConstraint('id')
     )
     # ### end Alembic commands ###
@@ -221,7 +221,7 @@ def upgrade():
                    [
                        {'id': 1, 'area_id': 5, 'name': 'The Musical Hop', 'address': '1015 Folsom Street', 'phone': '123-123-1234', 'website': 'https://www.themusicalhop.com',  'seeking_description': 'We are on the lookout for a local artist to play every two weeks. Please call us.', 'seeking_talent': True,
                            'facebook_link': 'https://www.facebook.com/TheMusicalHop', 'image_link': 'https://images.unsplash.com/photo-1543900694-133f37abaaa5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=400&q=60'},
-                       {'id': 2, 'area_id': 28, 'name': 'The Dueling Pianos Bar', 'address': '335 Delancey Street', 'phone': '914-003-1132', 'website': 'https://www.theduelingpianos.com', 'facebook_link': 'https://www.facebook.com/theduelingpianos',
+                       {'id': 2, 'area_id': 27, 'name': 'The Dueling Pianos Bar', 'address': '335 Delancey Street', 'phone': '914-003-1132', 'website': 'https://www.theduelingpianos.com', 'facebook_link': 'https://www.facebook.com/theduelingpianos',
                            'seeking_description': None, 'seeking_talent': False, 'image_link': 'https://images.unsplash.com/photo-1497032205916-ac775f0649ae?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=750&q=80'},
                        {'id': 3, 'area_id': 5, 'name': 'Park Square Live Music & Coffee', 'address': '34 Whiskey Moore Ave', 'phone': '415-000-1234', 'website': 'https://www.parksquarelivemusicandcoffee.com',
                            'facebook_link': 'https://www.facebook.com/ParkSquareLiveMusicAndCoffee',

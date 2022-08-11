@@ -74,5 +74,6 @@
 
 <a href="/artists/{{ artist.id }}/edit"><button class="btn btn-primary btn-lg">Edit</button></a>
 
+<button onclick="deleteObj(this)" id="artists_{{ artist.id }}" class="delete-artist btn btn-danger btn-lg" data-id="{{ artist.id }}">Delete</button>
 {% endblock %}
 

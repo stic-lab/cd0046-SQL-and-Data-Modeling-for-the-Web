@@ -77,5 +77,7 @@
 
 <a href="/venues/{{ venue.id }}/edit"><button class="btn btn-primary btn-lg">Edit</button></a>
 
+<button onclick="deleteObj(this)" id="venues_{{ venue.id }}" class="delete-button btn btn-danger btn-lg" data-id="{{ venue.id }}">Delete</button>
+
 {% endblock %}
 
