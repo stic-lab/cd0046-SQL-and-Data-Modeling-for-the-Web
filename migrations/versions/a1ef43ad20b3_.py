@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 0035ab39c1db
+Revision ID: a1ef43ad20b3
 Revises: 
-Create Date: 2022-08-11 09:57:33.885414
+Create Date: 2022-08-11 14:27:36.013669
 
 """
 from alembic import op
@@ -17,7 +17,7 @@ from sqlalchemy import String, Integer, Date, Boolean, DateTime
 
 
 # revision identifiers, used by Alembic.
-revision = '0035ab39c1db'
+revision = 'a1ef43ad20b3'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -90,7 +90,7 @@ def upgrade():
     sa.PrimaryKeyConstraint('name')
     )
     op.create_table('artist',
-    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('name', sa.String(length=50), nullable=False),
     sa.Column('state', sa.String(length=2), nullable=False),
     sa.Column('city', sa.String(length=50), nullable=True),
@@ -106,7 +106,7 @@ def upgrade():
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('venue',
-    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('name', sa.String(length=50), nullable=False),
     sa.Column('address', sa.String(length=255), nullable=False),
     sa.Column('state', sa.String(length=2), nullable=False),
@@ -137,7 +137,7 @@ def upgrade():
     sa.PrimaryKeyConstraint('genres', 'venue_id')
     )
     op.create_table('shows',
-    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('artist_id', sa.Integer(), nullable=True),
     sa.Column('venue_id', sa.Integer(), nullable=True),
     sa.Column('start_time', sa.DateTime(), nullable=False),
@@ -231,11 +231,11 @@ def upgrade():
 
     op.bulk_insert(venue,
                    [
-                       {'id': 1, 'state': 'CA', 'city': 'San Francisco', 'name': 'The Musical Hop', 'address': '1015 Folsom Street', 'phone': '123-123-1234', 'website': 'https://www.themusicalhop.com',  'seeking_description': 'We are on the lookout for a local artist to play every two weeks. Please call us.', 'seeking_talent': True,
+                       {'state': 'CA', 'city': 'San Francisco', 'name': 'The Musical Hop', 'address': '1015 Folsom Street', 'phone': '123-123-1234', 'website': 'https://www.themusicalhop.com',  'seeking_description': 'We are on the lookout for a local artist to play every two weeks. Please call us.', 'seeking_talent': True,
                            'facebook_link': 'https://www.facebook.com/TheMusicalHop', 'image_link': 'https://images.unsplash.com/photo-1543900694-133f37abaaa5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=400&q=60'},
-                       {'id': 2, 'state': 'NY', 'city': 'New York', 'name': 'The Dueling Pianos Bar', 'address': '335 Delancey Street', 'phone': '914-003-1132', 'website': 'https://www.theduelingpianos.com', 'facebook_link': 'https://www.facebook.com/theduelingpianos',
+                       {'state': 'NY', 'city': 'New York', 'name': 'The Dueling Pianos Bar', 'address': '335 Delancey Street', 'phone': '914-003-1132', 'website': 'https://www.theduelingpianos.com', 'facebook_link': 'https://www.facebook.com/theduelingpianos',
                            'seeking_description': None, 'seeking_talent': False, 'image_link': 'https://images.unsplash.com/photo-1497032205916-ac775f0649ae?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=750&q=80'},
-                       {'id': 3, 'state': 'CA', 'city': 'San Francisco', 'name': 'Park Square Live Music & Coffee', 'address': '34 Whiskey Moore Ave', 'phone': '415-000-1234', 'website': 'https://www.parksquarelivemusicandcoffee.com',
+                       {'state': 'CA', 'city': 'San Francisco', 'name': 'Park Square Live Music & Coffee', 'address': '34 Whiskey Moore Ave', 'phone': '415-000-1234', 'website': 'https://www.parksquarelivemusicandcoffee.com',
                            'facebook_link': 'https://www.facebook.com/ParkSquareLiveMusicAndCoffee',
                            'seeking_description': None, 'seeking_talent': False, 'image_link': 'https://images.unsplash.com/photo-1485686531765-ba63b07845a7?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=747&q=80'}
                    ]

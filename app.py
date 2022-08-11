@@ -32,7 +32,8 @@ app = Flask(__name__)
 moment = Moment(app)
 app.config.from_object('config')
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:postgres@localhost:5432/fyyur'
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:postgres@localhost:5432/fyyur'
+
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
@@ -49,6 +50,15 @@ genre_artist = db.Table('genre_artist',
                         db.Column('artist_id', db.Integer, db.ForeignKey(
                      'artist.id'), primary_key=True),
                  )
+
+                 
+# Create Area Models
+class GenreArtist():
+  def __init__(self, genres, artist_id):
+    self.venue = artist_id,
+    self.genres = genres
+db.mapper(GenreArtist, genre_artist)
+
 genre_venue = db.Table('genre_venue',
                        db.Column('genres', db.String(50), db.ForeignKey(
                            'genres.name'), primary_key=True),
@@ -56,16 +66,18 @@ genre_venue = db.Table('genre_venue',
                            'venue.id'), primary_key=True))
 
 
+# Create Area Models
+class GenreVenue():
+  def __init__(self, genres, venue_id):
+    self.venue = venue_id,
+    self.genres = genres
+db.mapper(GenreVenue, genre_venue)
 
 
 # Create Area Models
 class Genre(db.Model):
     __tablename__ = 'genres'
     name = db.Column(db.String(50), primary_key=True)
-    genre_venue = db.relationship('Venue', secondary=genre_venue,
-                                  backref=db.backref('genres', lazy=True))
-    genre_artist = db.relationship('Artist', secondary=genre_artist,
-                                  backref=db.backref('genres', lazy=True))
 
     def __repr__(self) -> str:
        return f'{self.name}'
@@ -84,7 +96,7 @@ class Area(db.Model):
 class Venue(db.Model):
     __tablename__ = 'venue'
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(50), nullable=False)
     address = db.Column(db.String(255), nullable=False)
     state = db.Column(db.String(2), db.ForeignKey(
@@ -98,6 +110,8 @@ class Venue(db.Model):
     image_link = db.Column(db.String(255), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow)
+    genres = db.relationship('Genre', secondary=genre_venue, backref=db.backref('venues', lazy=True))
+    # genres = association_proxy('_genres', 'name')
     # artist_rel = db.relationship('Shows',  backref="venue", lazy=True)
     artist = association_proxy("artists.id", "artist")
 
@@ -108,7 +122,7 @@ class Venue(db.Model):
 class Artist(db.Model):
     __tablename__ = 'artist'
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(50), nullable=False)
     state = db.Column(db.String(2), db.ForeignKey(
         'area.state'), nullable=False)
@@ -121,6 +135,8 @@ class Artist(db.Model):
     image_link = db.Column(db.String(500), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow)
+    genres = db.relationship('Genre', secondary=genre_artist,backref=db.backref('artists', lazy=True))
+    # genres = association_proxy('_genres', 'name')
     # venues_rel = db.relationship('Shows',  backref="artist", lazy=True)
     venue = association_proxy("venues.id", "venue")
 
@@ -132,7 +148,7 @@ class Artist(db.Model):
 # Create Show Models, this model containt the many to many relationship between Venues and Artists
 class Shows(db.Model):
     __tablename__ = 'shows'
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     artist_id = db.Column(db.Integer, db.ForeignKey('artist.id', ondelete='SET NULL'), nullable=True)
     venue_id = db.Column(db.Integer, db.ForeignKey('venue.id', ondelete='SET NULL'), nullable=True)
     start_time = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
@@ -274,39 +290,43 @@ def create_venue_submission():
   # TODO: insert form data as a new Venue record in the db, instead
   # TODO: modify data to be the data object returned from db insertion
   form = VenueForm()
-  if form.validate_on_submit():
-    name = form.name.data
-    address = form.address.data
-    city = form.city.data
-    state = form.state.data
-    genres = form.genres.data
-    phone = form.phone.data
-    website = form.website_link.data
-    facebook_link = form.facebook_link.data
-    seeking_talent = form.seeking_talent.data
-    seeking_description = form.seeking_description.data
-    image_link = form.image_link.data
+  # print("about to validate", file=sys.stderr)
+  if form.validate_on_submit():  
     new_venue = Venue(
-      name = name,
-      address = address,
-      phone = phone,
-      website = website,
-      image_link = image_link,
-      facebook_link = facebook_link,
-      seeking_talent = seeking_talent,
-      seeking_description = seeking_description,
+      name = form.name.data,
+      address = form.address.data,
+      city = form.city.data,
+      phone = form.phone.data,
+      website = form.website_link.data,
+      image_link = form.image_link.data,
+      facebook_link = form.facebook_link.data,
+      seeking_talent=form.seeking_talent.data,
+      seeking_description = form.seeking_description.data,
     )
-    # new_venue.
-    # form.populate_obj(new_venue)
-    db.session.add(new_venue)
-    db.session.commit()
+    new_venue.state = form.state.data
+    # new_venue.state = Area(state = form.state.data)
+    genres = []
+    
+    for genre in form.genres.data:
+      if Genre.query.filter_by(name=genre).one():
+        genres.append(Genre.query.filter_by(name=genre).one())
+      else:
+        genres.append(genre)
 
-
-  # on successful db insert, flash success
-  flash('Venue ' + request.form['name'] + ' was successfully listed!')
-  # TODO: on unsuccessful db insert, flash an error instead.
-  # e.g., flash('An error occurred. Venue ' + data.name + ' could not be listed.')
-  # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
+    new_venue.genres = genres
+    # genres.append([])
+    try:
+      db.session.add(new_venue)
+      db.session.commit()
+      flash('Venue ' + form.name.data + ' was successfully listed!')
+    except Exception as e:
+      db.session.rollback()
+      flash('An error occurred. Venue ' +
+            form.name.data + ' could not be listed.')
+    finally:
+      db.session.close()
+  else:
+    flash('Form must be correctly filled')
   return render_template(home)
 
 @app.route('/venues/<venue_id>', methods=['DELETE'])
@@ -479,14 +499,42 @@ def create_artist_form():
 
 @app.route('/artists/create', methods=['POST'])
 def create_artist_submission():
-  # called upon submitting the new artist listing form
-  # TODO: insert form data as a new Venue record in the db, instead
-  # TODO: modify data to be the data object returned from db insertion
+  form = ArtistForm()
+  # print("about to validate", file=sys.stderr)
+  if form.validate_on_submit():
+    new_artist = Artist(
+        name=form.name.data,
+        city=form.city.data,
+        phone=form.phone.data,
+        website=form.website_link.data,
+        image_link=form.image_link.data,
+        facebook_link=form.facebook_link.data,
+        seeking_venue=form.seeking_talent.data,
+        seeking_description=form.seeking_description.data,
+    )
+    new_artist.state = form.state.data
+    genres = []
 
-  # on successful db insert, flash success
-  flash('Artist ' + request.form['name'] + ' was successfully listed!')
-  # TODO: on unsuccessful db insert, flash an error instead.
-  # e.g., flash('An error occurred. Artist ' + data.name + ' could not be listed.')
+    for genre in form.genres.data:
+      if Genre.query.filter_by(name=genre).one():
+        genres.append(Genre.query.filter_by(name=genre).one())
+      else:
+        genres.append(genre)
+
+    new_artist.genres = genres
+    # genres.append([])
+    try:
+      db.session.add(new_artist)
+      db.session.commit()
+      flash('Venue ' + form.name.data + ' was successfully listed!')
+    except Exception as e:
+      db.session.rollback()
+      flash('An error occurred. Venue ' +
+            form.name.data + ' could not be listed.')
+    finally:
+      db.session.close()
+  else:
+    flash('Form must be correctly filled')
   return render_template(home)
 
 
