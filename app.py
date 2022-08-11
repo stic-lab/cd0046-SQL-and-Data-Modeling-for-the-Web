@@ -3,8 +3,10 @@
 #----------------------------------------------------------------------------#
 
 from cmath import e
+from time import timezone
 from unittest import result
 from urllib import response
+from xmlrpc.client import DateTime
 from sqlalchemy.ext.associationproxy import association_proxy
 from enum import unique
 import json
@@ -19,6 +21,7 @@ from flask_migrate import Migrate
 import logging
 from logging import Formatter, FileHandler
 from flask_wtf import Form
+from sqlalchemy.sql import func
 from forms import *
 
 #----------------------------------------------------------------------------#
@@ -70,14 +73,12 @@ class Genre(db.Model):
 # Create Area Models
 class Area(db.Model):
     __tablename__ = 'area'
-    id = db.Column(db.Integer, primary_key=True)
-    state = db.Column(db.String(2), unique=True)
-    city = db.Column(db.String(50), nullable=True)
+    state = db.Column(db.String(2), primary_key=True)
     venues = db.relationship('Venue', backref='area', lazy=True)
     artists = db.relationship('Artist', backref='area', lazy=True)
 
     def __repr__(self) -> str:
-       return f'{self.city}, {self.state}'
+       return f'{self.state}'
 
 # Create Venue Models
 class Venue(db.Model):
@@ -86,14 +87,17 @@ class Venue(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
     address = db.Column(db.String(255), nullable=False)
-    area_id = db.Column(db.Integer, db.ForeignKey(
-        'area.id'), nullable=False)
+    state = db.Column(db.String(2), db.ForeignKey(
+        'area.state'), nullable=False)
+    city = db.Column(db.String(50), nullable=True)
     phone = db.Column(db.String(50), nullable=True)
     website = db.Column(db.String(255))
     facebook_link = db.Column(db.String(255), nullable=True)
     seeking_talent = db.Column(db.Boolean, nullable=False, default=False)
     seeking_description = db.Column(db.String(255), nullable=True)
     image_link = db.Column(db.String(255), nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow)
     # artist_rel = db.relationship('Shows',  backref="venue", lazy=True)
     artist = association_proxy("artists.id", "artist")
 
@@ -106,14 +110,17 @@ class Artist(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
-    area_id = db.Column(db.Integer, db.ForeignKey(
-        'area.id'), nullable=False)
+    state = db.Column(db.String(2), db.ForeignKey(
+        'area.state'), nullable=False)
+    city = db.Column(db.String(50), nullable=True)
     phone = db.Column(db.String(120), nullable=True)
     website = db.Column(db.String(120), nullable=True)
     facebook_link = db.Column(db.String(120), nullable=True)
     seeking_venue = db.Column(db.Boolean, nullable=False, default=False)
     seeking_description = db.Column(db.String(255), nullable=True)
     image_link = db.Column(db.String(500), nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow)
     # venues_rel = db.relationship('Shows',  backref="artist", lazy=True)
     venue = association_proxy("venues.id", "venue")
 
@@ -128,9 +135,11 @@ class Shows(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     artist_id = db.Column(db.Integer, db.ForeignKey('artist.id', ondelete='SET NULL'), nullable=True)
     venue_id = db.Column(db.Integer, db.ForeignKey('venue.id', ondelete='SET NULL'), nullable=True)
-    start_time = db.Column(db.DateTime, nullable=False)
+    start_time = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     venues = db.relationship("Venue", backref="shows")
     artists = db.relationship("Artist", backref="shows")
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 
 #----------------------------------------------------------------------------#
@@ -161,7 +170,26 @@ def index():
 
 @app.route('/venues')
 def venues():
-  return render_template('pages/venues.html', areas=Area.query.join(Venue).all())
+  results=Area.query.join(Venue).all()
+  areas = []
+  current_time = datetime.now()
+  for result in results:
+    venues = []
+    for venue in result.venues:
+      upcomming_shows = db.session.query(Venue).join(Shows).filter(
+          Shows.venue_id == venue.id, Shows.start_time > current_time).count()
+      venues.append({
+        "id": venue.id,
+        "name": venue.name,
+        "num_upcoming_shows": upcomming_shows,
+      })
+    areas.append({
+        "city": result.venues[0].city,
+      "state": result.state,
+      "venues": venues 
+    })
+
+  return render_template('pages/venues.html', areas=areas)
 
 @app.route('/venues/search', methods=['POST'])
 def search_venues():
@@ -217,7 +245,7 @@ def show_venue(venue_id):
       "id": venue.id,
       "name": venue.name,
       "genres": venue.genres,
-      "city": venue.area.city,
+      "city": venue.city,
       "state": venue.area.state,
       "phone": venue.phone,
       "website": venue.website,
@@ -261,7 +289,6 @@ def create_venue_submission():
     new_venue = Venue(
       name = name,
       address = address,
-      city = city,
       phone = phone,
       website = website,
       image_link = image_link,
@@ -269,6 +296,7 @@ def create_venue_submission():
       seeking_talent = seeking_talent,
       seeking_description = seeking_description,
     )
+    # new_venue.
     # form.populate_obj(new_venue)
     db.session.add(new_venue)
     db.session.commit()
@@ -372,7 +400,7 @@ def show_artist(artist_id):
     "id": artist.id,
     "name": artist.name,
     "genres": artist.genres,
-    "city": artist.area.city,
+    "city": artist.city,
     "state": artist.area.state,
     "phone": artist.phone,
     "website": artist.website,
