@@ -242,11 +242,17 @@ def upgrade():
                    )
 
     op.bulk_insert(artist, [
-        {'id': 4, 'name': 'Guns N Petals', 'state': 'CA', 'city': 'San Francisco', 'phone': '326-123-5000', 'website': 'https://www.gunsnpetalsband.com', 'facebook_link': 'https://www.facebook.com/GunsNPetals', 'seeking_venue': True, 'seeking_description':
+        {'name': 'Jean Freddy', 'state': 'MA', 'city': 'Toamasina', 'phone': '320-000-5000', 'website': 'https://www.gunsnpetalsband.com', 'facebook_link': 'https://www.facebook.com/GunsNPetals', 'seeking_venue': True, 'seeking_description':
             'Looking for shows to perform at in the San Francisco Bay Area!', 'image_link': 'https://images.unsplash.com/photo-1549213783-8284d0336c4f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=300&q=80'},
-        {'id': 5, 'name': 'Matt Quevedo', 'state': 'NY', 'city': 'New York', 'phone': '300-400-5000', 'facebook_link': 'https://www.facebook.com/mattquevedo923251523',
+        {'name': 'Jopa Bango', 'state': 'MA', 'city': 'Toamasina', 'phone': '326-123-5000', 'website': 'https://www.gunsnpetalsband.com', 'facebook_link': 'https://www.facebook.com/GunsNPetals',
+            'seeking_venue': False, 'seeking_description': None, 'image_link': 'https://images.unsplash.com/photo-1549213783-8284d0336c4f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=300&q=80'},
+        {'name': 'Vazo milay', 'state': 'MA', 'city': 'San Francisco', 'phone': '326-123-5000', 'website': 'https://www.gunsnpetalsband.com', 'facebook_link': 'https://www.facebook.com/GunsNPetals', 'seeking_venue': True, 'seeking_description':
+            'Looking for shows to perform at in the San Francisco Bay Area!', 'image_link': 'https://images.unsplash.com/photo-1549213783-8284d0336c4f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=300&q=80'},
+        {'name': 'Guns N Petals', 'state': 'CA', 'city': 'San Francisco', 'phone': '326-123-5000', 'website': 'https://www.gunsnpetalsband.com', 'facebook_link': 'https://www.facebook.com/GunsNPetals', 'seeking_venue': True, 'seeking_description':
+            'Looking for shows to perform at in the San Francisco Bay Area!', 'image_link': 'https://images.unsplash.com/photo-1549213783-8284d0336c4f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=300&q=80'},
+        {'name': 'Matt Quevedo', 'state': 'NY', 'city': 'New York', 'phone': '300-400-5000', 'facebook_link': 'https://www.facebook.com/mattquevedo923251523',
          'seeking_venue': False, 'seeking_description': None, 'image_link': 'https://images.unsplash.com/photo-1495223153807-b916f75de8c5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=334&q=80'},
-        {'id': 6, 'name': 'The Wild Sax Band', 'state': 'CA', 'city': 'San Francisco', 'facebook_link': None, 'phone': '432-325-5432',
+        {'name': 'The Wild Sax Band', 'state': 'CA', 'city': 'San Francisco', 'facebook_link': None, 'phone': '432-325-5432',
          'seeking_venue': False, 'seeking_description': None,
          'image_link': 'https://images.unsplash.com/photo-1558369981-f9ca78462e61?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=794&q=80'}
     ]
@@ -279,15 +285,15 @@ def upgrade():
                    )
     op.bulk_insert(shows,
                    [
-                       {'id': 1, 'venue_id': 1, 'artist_id': 4,
+                       {'venue_id': 1, 'artist_id': 4,
                            'start_time': '2019-05-21T21:30:00.000Z'},
-                       {'id': 2, 'venue_id': 3, 'artist_id': 5,
+                       {'venue_id': 3, 'artist_id': 5,
                         'start_time': '2019-06-15T23:00:00.000Z'},
-                       {'id': 3, 'venue_id': 3, 'artist_id': 6,
+                       {'venue_id': 3, 'artist_id': 6,
                         'start_time': '2035-04-01T20:00:00.000Z'},
-                       {'id': 4, 'venue_id': 3, 'artist_id': 6,
+                       {'venue_id': 3, 'artist_id': 6,
                         'start_time': '2035-04-08T20:00:00.000Z'},
-                       {'id': 5, 'venue_id': 3, 'artist_id': 6,
+                       {'venue_id': 3, 'artist_id': 6,
                         'start_time': '2035-04-15T20:00:00.000Z'}
                    ])
 

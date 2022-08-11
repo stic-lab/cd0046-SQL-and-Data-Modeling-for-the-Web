@@ -509,7 +509,7 @@ def create_artist_submission():
         website=form.website_link.data,
         image_link=form.image_link.data,
         facebook_link=form.facebook_link.data,
-        seeking_venue=form.seeking_talent.data,
+        seeking_venue=form.seeking_venue.data,
         seeking_description=form.seeking_description.data,
     )
     new_artist.state = form.state.data
@@ -526,10 +526,10 @@ def create_artist_submission():
     try:
       db.session.add(new_artist)
       db.session.commit()
-      flash('Venue ' + form.name.data + ' was successfully listed!')
+      flash('Artist ' + form.name.data + ' was successfully listed!')
     except Exception as e:
       db.session.rollback()
-      flash('An error occurred. Venue ' +
+      flash('An error occurred. Artist ' +
             form.name.data + ' could not be listed.')
     finally:
       db.session.close()
@@ -564,14 +564,27 @@ def create_shows():
 
 @app.route('/shows/create', methods=['POST'])
 def create_show_submission():
-  # called to create new shows in the db, upon submitting new show listing form
-  # TODO: insert form data as a new Show record in the db, instead
-
-  # on successful db insert, flash success
-  flash('Show was successfully listed!')
-  # TODO: on unsuccessful db insert, flash an error instead.
-  # e.g., flash('An error occurred. Show could not be listed.')
-  # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
+  form = ShowForm()
+  # print("about to validate", file=sys.stderr)
+  if form.validate_on_submit():
+    new_shows = Shows(
+        artist_id=form.artist_id.data,
+        venue_id=form.venue_id.data,
+        start_time=form.start_time.data
+    )
+    
+    try:
+      db.session.add(new_shows)
+      db.session.commit()
+      flash('Show was successfully listed!')
+    except Exception as e:
+      db.session.rollback()
+      flash('An error occurred. Show could not be listed.')
+      flash(e)
+    finally:
+      db.session.close()
+  else:
+    flash('Form must be correctly filled')
   return render_template(home)
 
 @app.errorhandler(404)
