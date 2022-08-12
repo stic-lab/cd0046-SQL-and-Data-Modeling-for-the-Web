@@ -106,7 +106,7 @@ def show_venue(venue_id):
         }
     )
 
-  past_shows = db.session.query(Venue).join(Shows).filter(
+  past_shows = db.session.query(Artist).join(Shows).filter(
       Shows.venue_id == venue.id, Shows.start_time <= current_time).all()
   past = []
   for artist in past_shows:
