@@ -2,161 +2,15 @@
 # Imports
 #----------------------------------------------------------------------------#
 
-from cmath import e
-from time import timezone
-from unittest import result
-from urllib import response
-from xmlrpc.client import DateTime
-from sqlalchemy.ext.associationproxy import association_proxy
-from enum import unique
-import json
+
 import dateutil.parser
-import datetime
+from datetime import datetime
 import babel
-from flask import Flask, render_template, request, Response, flash, redirect, url_for, url_for, jsonify, abort
-from sqlalchemy.ext.associationproxy import association_proxy
-from flask_moment import Moment
-from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
+from flask import render_template, request, flash, redirect, url_for, url_for, jsonify
 import logging
 from logging import Formatter, FileHandler
-from flask_wtf import Form
-from sqlalchemy.sql import func
-from forms import *
-
-#----------------------------------------------------------------------------#
-# App Config.
-#----------------------------------------------------------------------------#
-
-app = Flask(__name__)
-moment = Moment(app)
-app.config.from_object('config')
-
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:postgres@localhost:5432/fyyur'
-
-db = SQLAlchemy(app)
-migrate = Migrate(app, db)
-
-#----------------------------------------------------------------------------#
-# Models.
-#----------------------------------------------------------------------------#
-
-
-
-# Create genre_associations Models, this model containt the many to many relationship between Venues/Artist and genres
-genre_artist = db.Table('genre_artist',
-                        db.Column('genres', db.String(50), db.ForeignKey(
-                     'genres.name'), primary_key=True),
-                        db.Column('artist_id', db.Integer, db.ForeignKey(
-                     'artist.id'), primary_key=True),
-                 )
-
-                 
-# Create Area Models
-class GenreArtist():
-  def __init__(self, genres, artist_id):
-    self.venue = artist_id,
-    self.genres = genres
-db.mapper(GenreArtist, genre_artist)
-
-genre_venue = db.Table('genre_venue',
-                       db.Column('genres', db.String(50), db.ForeignKey(
-                           'genres.name'), primary_key=True),
-                       db.Column('venue_id', db.Integer, db.ForeignKey(
-                           'venue.id'), primary_key=True))
-
-
-# Create Area Models
-class GenreVenue():
-  def __init__(self, genres, venue_id):
-    self.venue = venue_id,
-    self.genres = genres
-db.mapper(GenreVenue, genre_venue)
-
-
-# Create Area Models
-class Genre(db.Model):
-    __tablename__ = 'genres'
-    name = db.Column(db.String(50), primary_key=True)
-
-    def __repr__(self) -> str:
-       return f'{self.name}'
-
-# Create Area Models
-class Area(db.Model):
-    __tablename__ = 'area'
-    state = db.Column(db.String(2), primary_key=True)
-    venues = db.relationship('Venue', backref='area', lazy=True)
-    artists = db.relationship('Artist', backref='area', lazy=True)
-
-    def __repr__(self) -> str:
-       return f'{self.state}'
-
-# Create Venue Models
-class Venue(db.Model):
-    __tablename__ = 'venue'
-
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    name = db.Column(db.String(50), nullable=False)
-    address = db.Column(db.String(255), nullable=False)
-    state = db.Column(db.String(2), db.ForeignKey(
-        'area.state'), nullable=False)
-    city = db.Column(db.String(50), nullable=True)
-    phone = db.Column(db.String(50), nullable=True)
-    website = db.Column(db.String(255))
-    facebook_link = db.Column(db.String(255), nullable=True)
-    seeking_talent = db.Column(db.Boolean, nullable=False, default=False)
-    seeking_description = db.Column(db.String(255), nullable=True)
-    image_link = db.Column(db.String(255), nullable=True)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow)
-    genres = db.relationship('Genre', secondary=genre_venue, backref=db.backref('venues', lazy=True))
-    # genres = association_proxy('_genres', 'name')
-    # artist_rel = db.relationship('Shows',  backref="venue", lazy=True)
-    artist = association_proxy("artists.id", "artist")
-
-    def __repr__(self) -> str:
-       return super().__repr__()
-
-# Create Artist Models
-class Artist(db.Model):
-    __tablename__ = 'artist'
-
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    name = db.Column(db.String(50), nullable=False)
-    state = db.Column(db.String(2), db.ForeignKey(
-        'area.state'), nullable=False)
-    city = db.Column(db.String(50), nullable=True)
-    phone = db.Column(db.String(120), nullable=True)
-    website = db.Column(db.String(120), nullable=True)
-    facebook_link = db.Column(db.String(120), nullable=True)
-    seeking_venue = db.Column(db.Boolean, nullable=False, default=False)
-    seeking_description = db.Column(db.String(255), nullable=True)
-    image_link = db.Column(db.String(500), nullable=True)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow)
-    genres = db.relationship('Genre', secondary=genre_artist,backref=db.backref('artists', lazy=True))
-    # genres = association_proxy('_genres', 'name')
-    # venues_rel = db.relationship('Shows',  backref="artist", lazy=True)
-    venue = association_proxy("venues.id", "venue")
-
-    def __repr__(self) -> str:
-       return super().__repr__()
-
-
-
-# Create Show Models, this model containt the many to many relationship between Venues and Artists
-class Shows(db.Model):
-    __tablename__ = 'shows'
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    artist_id = db.Column(db.Integer, db.ForeignKey('artist.id', ondelete='SET NULL'), nullable=True)
-    venue_id = db.Column(db.Integer, db.ForeignKey('venue.id', ondelete='SET NULL'), nullable=True)
-    start_time = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    venues = db.relationship("Venue", backref="shows")
-    artists = db.relationship("Artist", backref="shows")
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow)
-
+from forms import ShowForm, VenueForm, ArtistForm
+from models import Area, Venue, Genre, Artist, Shows, app, moment, db, migrate
 
 #----------------------------------------------------------------------------#
 # Filters.
@@ -302,7 +156,6 @@ def create_venue_submission():
       seeking_description = form.seeking_description.data,
     )
     new_venue.state = form.state.data
-    # new_venue.state = Area(state = form.state.data)
     genres = []
     
     for genre in form.genres.data:
@@ -312,7 +165,6 @@ def create_venue_submission():
         genres.append(genre)
 
     new_venue.genres = genres
-    # genres.append([])
     try:
       db.session.add(new_venue)
       db.session.commit()
@@ -341,6 +193,8 @@ def delete_venue(venue_id):
     db.session.close()
   return jsonify({ 'success': True })
 
+
+#  ----------------------------------------------------------------
 #  Artists
 #  ----------------------------------------------------------------
 @app.route('/artists')
@@ -458,7 +312,6 @@ def edit_artist(artist_id):
 def edit_artist_submission(artist_id):
 
   form = ArtistForm()
-  # print("about to validate", file=sys.stderr)
   if form.validate_on_submit():
     artist = Artist.query.get(artist_id)
     artist.name = form.name.data
@@ -515,7 +368,6 @@ def edit_venue(venue_id):
 @app.route('/venues/<int:venue_id>/edit', methods=['POST'])
 def edit_venue_submission(venue_id):
   form = VenueForm()
-  # print("about to validate", file=sys.stderr)
   if form.validate_on_submit():
     venue = Venue.query.get(venue_id)
     venue.name = form.name.data,
@@ -550,6 +402,8 @@ def edit_venue_submission(venue_id):
 
   return redirect(url_for('show_venue', venue_id=venue_id))
 
+
+#  ----------------------------------------------------------------
 #  Create Artist
 #  ----------------------------------------------------------------
 
@@ -583,7 +437,6 @@ def create_artist_submission():
         genres.append(genre)
 
     new_artist.genres = genres
-    # genres.append([])
     try:
       db.session.add(new_artist)
       db.session.commit()
@@ -599,6 +452,8 @@ def create_artist_submission():
   return render_template(home)
 
 
+
+#  ----------------------------------------------------------------
 #  Shows
 #  ----------------------------------------------------------------
 
@@ -626,7 +481,6 @@ def create_shows():
 @app.route('/shows/create', methods=['POST'])
 def create_show_submission():
   form = ShowForm()
-  # print("about to validate", file=sys.stderr)
   if form.validate_on_submit():
     new_shows = Shows(
         artist_id=form.artist_id.data,
@@ -665,6 +519,7 @@ if not app.debug:
     file_handler.setLevel(logging.INFO)
     app.logger.addHandler(file_handler)
     app.logger.info('errors')
+
 
 #----------------------------------------------------------------------------#
 # Launch.
