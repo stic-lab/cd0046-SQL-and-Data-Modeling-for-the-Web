@@ -297,6 +297,8 @@ def upgrade():
                         'start_time': '2035-04-15T20:00:00.000Z'}
                    ])
 
+    op.execute('DELETE FROM artist WHERE artist.id in (1,2,3);')
+
 
 
 
