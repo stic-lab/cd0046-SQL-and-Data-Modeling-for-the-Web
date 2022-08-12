@@ -11,6 +11,7 @@ import logging
 from logging import Formatter, FileHandler
 from forms import ShowForm, VenueForm, ArtistForm
 from models import Area, Venue, Genre, Artist, Shows, app, moment, db, migrate
+from sqlalchemy import desc
 
 #----------------------------------------------------------------------------#
 # Filters.
@@ -32,7 +33,13 @@ app.jinja_env.filters['datetime'] = format_datetime
 home = 'pages/home.html'
 @app.route('/')
 def index():
-  return render_template(home)
+  venues = Venue.query.order_by(
+      desc(Venue.created_at)).limit(10).all()
+
+  artists = Artist.query.order_by(desc(Artist.created_at)).limit(10).all()
+  datas = {"venues": venues, "artists": artists}
+
+  return render_template(home, data=datas)
 
 
 #  Venues
@@ -177,7 +184,7 @@ def create_venue_submission():
       db.session.close()
   else:
     flash('Form must be correctly filled')
-  return render_template(home)
+  return redirect(url_for('index'))
 
 @app.route('/venues/<venue_id>', methods=['DELETE'])
 def delete_venue(venue_id):
@@ -449,7 +456,7 @@ def create_artist_submission():
       db.session.close()
   else:
     flash('Form must be correctly filled')
-  return render_template(home)
+  return redirect(url_for('index'))
 
 
 
@@ -499,7 +506,7 @@ def create_show_submission():
       db.session.close()
   else:
     flash('Form must be correctly filled')
-  return render_template(home)
+  return redirect(url_for('index'))
 
 @app.errorhandler(404)
 def not_found_error(error):

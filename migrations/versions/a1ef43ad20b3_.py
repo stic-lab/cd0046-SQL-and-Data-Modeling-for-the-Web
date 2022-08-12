@@ -232,29 +232,29 @@ def upgrade():
     op.bulk_insert(venue,
                    [
                        {'state': 'CA', 'city': 'San Francisco', 'name': 'The Musical Hop', 'address': '1015 Folsom Street', 'phone': '123-123-1234', 'website': 'https://www.themusicalhop.com',  'seeking_description': 'We are on the lookout for a local artist to play every two weeks. Please call us.', 'seeking_talent': True,
-                           'facebook_link': 'https://www.facebook.com/TheMusicalHop', 'image_link': 'https://images.unsplash.com/photo-1543900694-133f37abaaa5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=400&q=60'},
+                           'facebook_link': 'https://www.facebook.com/TheMusicalHop', 'image_link': 'https://images.unsplash.com/photo-1543900694-133f37abaaa5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=400&q=60', 'created_at': '2022-07-08 15:50:06', 'updated_at': '2022-07-08 15:50:06'},
                        {'state': 'NY', 'city': 'New York', 'name': 'The Dueling Pianos Bar', 'address': '335 Delancey Street', 'phone': '914-003-1132', 'website': 'https://www.theduelingpianos.com', 'facebook_link': 'https://www.facebook.com/theduelingpianos',
-                           'seeking_description': None, 'seeking_talent': False, 'image_link': 'https://images.unsplash.com/photo-1497032205916-ac775f0649ae?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=750&q=80'},
+                           'seeking_description': None, 'seeking_talent': False, 'image_link': 'https://images.unsplash.com/photo-1497032205916-ac775f0649ae?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=750&q=80', 'created_at': '2022-07-05 15:50:06', 'updated_at': '2022-07-05 15:50:06'},
                        {'state': 'CA', 'city': 'San Francisco', 'name': 'Park Square Live Music & Coffee', 'address': '34 Whiskey Moore Ave', 'phone': '415-000-1234', 'website': 'https://www.parksquarelivemusicandcoffee.com',
                            'facebook_link': 'https://www.facebook.com/ParkSquareLiveMusicAndCoffee',
-                           'seeking_description': None, 'seeking_talent': False, 'image_link': 'https://images.unsplash.com/photo-1485686531765-ba63b07845a7?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=747&q=80'}
+                           'seeking_description': None, 'seeking_talent': False, 'image_link': 'https://images.unsplash.com/photo-1485686531765-ba63b07845a7?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=747&q=80', 'created_at': '2022-02-28 15:50:06', 'updated_at': '2022-02-28 15:50:06'}
                    ]
                    )
 
     op.bulk_insert(artist, [
         {'name': 'Jean Freddy', 'state': 'MA', 'city': 'Toamasina', 'phone': '320-000-5000', 'website': 'https://www.gunsnpetalsband.com', 'facebook_link': 'https://www.facebook.com/GunsNPetals', 'seeking_venue': True, 'seeking_description':
-            'Looking for shows to perform at in the San Francisco Bay Area!', 'image_link': 'https://images.unsplash.com/photo-1549213783-8284d0336c4f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=300&q=80'},
+            'Looking for shows to perform at in the San Francisco Bay Area!', 'image_link': 'https://images.unsplash.com/photo-1549213783-8284d0336c4f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=300&q=80', 'created_at': '2020-07-31 15:00:06', 'updated_at': '2020-07-31 15:00:06'},
         {'name': 'Jopa Bango', 'state': 'MA', 'city': 'Toamasina', 'phone': '326-123-5000', 'website': 'https://www.gunsnpetalsband.com', 'facebook_link': 'https://www.facebook.com/GunsNPetals',
-            'seeking_venue': False, 'seeking_description': None, 'image_link': 'https://images.unsplash.com/photo-1549213783-8284d0336c4f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=300&q=80'},
+            'seeking_venue': False, 'seeking_description': None, 'image_link': 'https://images.unsplash.com/photo-1549213783-8284d0336c4f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=300&q=80', 'created_at': '2022-07-31 12:50:06', 'updated_at': '2022-07-31 12:50:06'},
         {'name': 'Vazo milay', 'state': 'MA', 'city': 'San Francisco', 'phone': '326-123-5000', 'website': 'https://www.gunsnpetalsband.com', 'facebook_link': 'https://www.facebook.com/GunsNPetals', 'seeking_venue': True, 'seeking_description':
-            'Looking for shows to perform at in the San Francisco Bay Area!', 'image_link': 'https://images.unsplash.com/photo-1549213783-8284d0336c4f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=300&q=80'},
+            'Looking for shows to perform at in the San Francisco Bay Area!', 'image_link': 'https://images.unsplash.com/photo-1549213783-8284d0336c4f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=300&q=80', 'created_at': '2002-07-31 15:50:06', 'updated_at': '2002-07-31 15:50:06'},
         {'name': 'Guns N Petals', 'state': 'CA', 'city': 'San Francisco', 'phone': '326-123-5000', 'website': 'https://www.gunsnpetalsband.com', 'facebook_link': 'https://www.facebook.com/GunsNPetals', 'seeking_venue': True, 'seeking_description':
-            'Looking for shows to perform at in the San Francisco Bay Area!', 'image_link': 'https://images.unsplash.com/photo-1549213783-8284d0336c4f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=300&q=80'},
+            'Looking for shows to perform at in the San Francisco Bay Area!', 'image_link': 'https://images.unsplash.com/photo-1549213783-8284d0336c4f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=300&q=80', 'created_at': '2022-07-31 15:50:00', 'updated_at': '2022-07-31 15:50:00'},
         {'name': 'Matt Quevedo', 'state': 'NY', 'city': 'New York', 'phone': '300-400-5000', 'facebook_link': 'https://www.facebook.com/mattquevedo923251523',
-         'seeking_venue': False, 'seeking_description': None, 'image_link': 'https://images.unsplash.com/photo-1495223153807-b916f75de8c5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=334&q=80'},
+         'seeking_venue': False, 'seeking_description': None, 'image_link': 'https://images.unsplash.com/photo-1495223153807-b916f75de8c5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=334&q=80', 'created_at': '2009-07-31 15:50:06', 'updated_at': '2009-07-31 15:50:06'},
         {'name': 'The Wild Sax Band', 'state': 'CA', 'city': 'San Francisco', 'facebook_link': None, 'phone': '432-325-5432',
          'seeking_venue': False, 'seeking_description': None,
-         'image_link': 'https://images.unsplash.com/photo-1558369981-f9ca78462e61?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=794&q=80'}
+         'image_link': 'https://images.unsplash.com/photo-1558369981-f9ca78462e61?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=794&q=80', 'created_at': '2005-07-31 15:50:06', 'updated_at': '2005-07-31 15:50:06'}
     ]
     )
 

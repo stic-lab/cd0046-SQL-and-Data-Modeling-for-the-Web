@@ -197,6 +197,7 @@ class Artist(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow)
     genres = db.relationship('Genre', secondary=genre_artist,backref=db.backref('artists', lazy=True))
+    availability = db.relationship('ArtistAvailability', backref='artist', lazy=True)
     shows = db.relationship(
         "Shows", cascade='all, delete-orphan', backref="artists")
 
@@ -239,3 +240,29 @@ class Shows(db.Model):
     #     "Artist", backref="shows")
     # venues = db.relationship(
     #     "Venue",  backref="shows")
+
+
+# db.mapper(Venue.id, Artist.venue)
+class ArtistAvailability(db.Model):
+    """Represent the artist_availability table.
+
+    ------------
+        schema:
+            -id: Integer, primary_key
+            -artist_id: Integer, db.ForeignKey('artist.id', ondelete='SET NULL'), nullable=True
+            -begin_date: DateTime, nullable=False, Start date when artist is available
+            -end_date: DateTime, nullable=False, End date when artist is available
+            -created_at:DateTime, default=datetime.utcnow, creation date
+            -updated_at:DateTime, default=datetime.utcnow, update date
+
+    """
+    __tablename__ = 'artist_availability'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    artist_id = db.Column(db.Integer, db.ForeignKey(
+        'artist.id'), nullable=True)
+    begin_date = db.Column(db.DateTime, nullable=False,
+                           default=datetime.utcnow)
+    end_date = db.Column(db.DateTime, nullable=False,
+                           default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow)

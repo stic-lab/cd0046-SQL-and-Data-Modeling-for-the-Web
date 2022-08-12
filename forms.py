@@ -91,7 +91,6 @@ class VenueForm(Form):
         'image_link'
     )
     genres = SelectMultipleField(
-        # TODO implement enum restriction
         'genres', validators=[DataRequired()],
         choices=[
             ('Alternative', 'Alternative'),
@@ -243,6 +242,15 @@ class ArtistForm(Form):
 
     seeking_description = StringField(
             'seeking_description'
+    )
+
+    begin_date = DateTimeField(
+        'begin_date',
+        default=datetime.today()
+    )
+    end_date = DateTimeField(
+        'end_date',
+        default=datetime.today()
     )
 
     def validate_phone(self, phone):
