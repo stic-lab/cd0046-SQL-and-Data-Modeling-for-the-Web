@@ -128,13 +128,13 @@ class VenueForm(Form):
         'seeking_description'
     )
 
-    # def validate_phone(self, phone):
-    #     try:
-    #         p = phonenumbers.parse(phone.data)
-    #         if not phonenumbers.is_valid_number(p):
-    #             raise ValueError()
-    #     except (phonenumbers.phonenumberutil.NumberParseException, ValueError):
-    #         raise ValidationError('Invalid phone number')
+    def validate_phone(self, phone):
+        try:
+            p = phonenumbers.parse(phone.data, self.state.data)
+            if not phonenumbers.is_valid_number(p):
+                raise ValueError()
+        except (phonenumbers.phonenumberutil.NumberParseException, ValueError):
+            raise ValidationError('Invalid phone number')
 
 
 
@@ -202,7 +202,6 @@ class ArtistForm(Form):
         ]
     )
     phone = StringField(
-        # TODO implement validation logic for state
         'phone', validators=[DataRequired()]
     )
     image_link = StringField(
@@ -233,7 +232,6 @@ class ArtistForm(Form):
         ]
      )
     facebook_link = StringField(
-        # TODO implement enum restriction
         'facebook_link', validators=[URL()]
      )
 
@@ -246,4 +244,13 @@ class ArtistForm(Form):
     seeking_description = StringField(
             'seeking_description'
     )
+
+    def validate_phone(self, phone):
+        try:
+            p = phonenumbers.parse(phone.data, self.state.data)
+            if not phonenumbers.is_valid_number(p):
+                raise ValueError()
+        except (phonenumbers.phonenumberutil.NumberParseException, ValueError):
+            raise ValidationError('Invalid phone number')
+
 
