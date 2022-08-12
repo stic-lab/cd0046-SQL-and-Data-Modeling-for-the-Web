@@ -243,16 +243,6 @@ class ArtistForm(Form):
     seeking_description = StringField(
             'seeking_description'
     )
-
-    begin_date = DateTimeField(
-        'begin_date',
-        default=datetime.today()
-    )
-    end_date = DateTimeField(
-        'end_date',
-        default=datetime.today()
-    )
-
     def validate_phone(self, phone):
         try:
             p = phonenumbers.parse(phone.data, self.state.data)
